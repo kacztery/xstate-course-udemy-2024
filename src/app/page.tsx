@@ -1,31 +1,36 @@
 "use client";
 
 import { useMachine } from "@xstate/react";
-import { fetchMachine } from "../../machines/fetchMachine";
+
+import { searchMachine } from "../../machines/searchMachine";
+import { log } from "console";
 
 export default function Home() {
-  const [state, send] = useMachine(fetchMachine);
+  const [state, send] = useMachine(searchMachine);
+
+  const { phrase, result } = state.context;
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    send({ type: "TYPE", data: e.target.value });
+  };
 
   return (
     <main>
-      <h1>XState works! Fetch Machine!</h1>
+      <h1>XState works! Search Machine!</h1>
 
-      {state.matches("pending") && <p>Fetching data...</p>}
+      <p>
+        State: <strong>{JSON.stringify(state.value)}</strong>.
+      </p>
 
-      {state.matches("success") && (
-        <ul>
-          {state.context.data.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      )}
+      <p>
+        Phrase: <strong>{phrase}</strong>.
+      </p>
 
-      {state.matches("error") && <p>Error...</p>}
+      <p>
+        Result: <strong>{result}</strong>
+      </p>
 
-      <br />
-      <button type="button" onClick={() => send("FETCH")}>
-        Fetch
-      </button>
+      <input value={phrase} onChange={handleOnChange} />
     </main>
   );
 }
